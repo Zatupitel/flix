@@ -28,9 +28,12 @@ float dt; // time delta from previous step, s
 float loopFreq; // loop frequency, Hz
 uint16_t channels[16]; // raw rc channels
 float controls[RC_CHANNELS]; // normalized controls in range [-1..1] ([0..1] for throttle)
+Vector gyro; // gyro data, rad/s
+Vector gyroBias; // estimated gyro bias, rad/s
 Vector rates; // angular rates, rad/s
 Vector acc; // accelerometer data, m/s/s
 Quaternion attitude; // estimated attitude
+bool landed; // estimated landed state
 float motors[4]; // normalized motors thrust in range [-1..1]
 
 void setup() {

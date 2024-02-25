@@ -24,7 +24,7 @@ void applyGyro() {
 void applyAcc() {
 	// test should we apply accelerometer gravity correction
 	float accNorm = acc.norm();
-	bool landed = !motorsActive() && abs(accNorm - ONE_G) < ONE_G * 0.1f;
+	landed = !motorsActive() && abs(accNorm - ONE_G) < ONE_G * 0.1f;
 
 	if (!landed) return;
 
@@ -38,6 +38,7 @@ void applyAcc() {
 }
 
 void signalizeHorizontality() {
-	float angle = Vector::angleBetweenVectors(attitude.rotate(Vector(0, 0, -1)), Vector(0, 0, -1));
-	setLED(angle < radians(15));
+	// float angle = Vector::angleBetweenVectors(attitude.rotate(Vector(0, 0, -1)), Vector(0, 0, -1));
+	// setLED(angle < radians(15));
+	setLED(landed);
 }

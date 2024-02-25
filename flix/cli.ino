@@ -66,10 +66,11 @@ void doCommand(String& command, String& value) {
 	} else if (command == "ps") {
 		Vector a = attitude.toEulerZYX();
 		Serial.printf("roll: %f pitch: %f yaw: %f\n", a.x * RAD_TO_DEG, a.y * RAD_TO_DEG, a.z * RAD_TO_DEG);
+		Serial.printf("landed: %d\n", landed);
 	} else if (command == "psq") {
 		Serial.printf("qx: %f qy: %f qz: %f qw: %f\n", attitude.x, attitude.y, attitude.z, attitude.w);
 	} else if (command == "imu") {
-		Serial.printf("gyro: %f %f %f\n", rates.x, rates.y, rates.z);
+		Serial.printf("gyro: %f %f %f\n", gyro.x, gyro.y, gyro.z);
 		Serial.printf("acc: %f %f %f\n", acc.x, acc.y, acc.z);
 		printIMUCal();
 	} else if (command == "rc") {

@@ -28,6 +28,7 @@ float controls[RC_CHANNELS];
 Vector acc;
 Vector rates;
 Quaternion attitude;
+bool landed;
 
 // declarations
 void computeLoopFreq();

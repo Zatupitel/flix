@@ -23,6 +23,9 @@ void setupIMU() {
 
 	if (LOAD_GYRO_CAL) loadGyroCal();
 	loadAccelCal();
+	IMU.setGyroBiasX_rads(0);
+	IMU.setGyroBiasY_rads(0);
+	IMU.setGyroBiasZ_rads(0);
 
 	IMU.setSrd(0); // set sample rate to 1000 Hz
 	// NOTE: very important, without the above the rate would be terrible 50 Hz
@@ -34,16 +37,22 @@ bool readIMU() {
 		return false;
 	}
 
-	auto lastRates = rates;
+	auto lastGyro = gyro;
 
-	rates.x = IMU.getGyroX_rads();
-	rates.y = IMU.getGyroY_rads();
-	rates.z = IMU.getGyroZ_rads();
+	gyro.x = IMU.getGyroX_rads();
+	gyro.y = IMU.getGyroY_rads();
+	gyro.z = IMU.getGyroZ_rads();
 	acc.x = IMU.getAccelX_mss();
 	acc.y = IMU.getAccelY_mss();
 	acc.z = IMU.getAccelZ_mss();
 
-	return rates != lastRates;
+	rates = gyro - gyroBias;
+
+	bool updated = gyro != lastGyro;
+	if (updated) {
+		calibrateGyroOnce();
+	}
+	return updated;
 }
 
 void calibrateGyro() {
@@ -52,6 +61,13 @@ void calibrateGyro() {
 	Serial.printf("Calibration status: %d\n", status);
 	IMU.setSrd(0);
 	printIMUCal();
+}
+
+void calibrateGyroOnce() {
+	if (!landed) return;
+	static uint32_t samples = 0; // overflows after 49 days at 1000 Hz
+	samples++;
+	gyroBias = gyroBias + (gyro - gyroBias) / samples;
 }
 
 void calibrateAccel() {
@@ -85,7 +101,8 @@ void loadGyroCal() {
 }
 
 void printIMUCal() {
-	Serial.printf("gyro bias: %f %f %f\n", IMU.getGyroBiasX_rads(), IMU.getGyroBiasY_rads(), IMU.getGyroBiasZ_rads());
+	Serial.printf("gyro old bias: %f %f %f\n", IMU.getGyroBiasX_rads(), IMU.getGyroBiasY_rads(), IMU.getGyroBiasZ_rads());
+	Serial.printf("gyro bias: %f %f %f\n", gyroBias.x, gyroBias.y, gyroBias.z);
 	Serial.printf("accel bias: %f %f %f\n", IMU.getAccelBiasX_mss(), IMU.getAccelBiasY_mss(), IMU.getAccelBiasZ_mss());
 	Serial.printf("accel scale: %f %f %f\n", IMU.getAccelScaleFactorX(), IMU.getAccelScaleFactorY(), IMU.getAccelScaleFactorZ());
 }
